@@ -1,72 +1,89 @@
 import { CustomGifcard } from "./components/ui/CustomGifcard";
 import { CustomSearch } from "./components/filters/CustomSearch";
 import { CustomSelect } from "./components/filters/CustomSelect";
-import { useEffect, useState } from "react";
-
-
-
-// const noImage = import.meta.env.VITE_NO_IMAGE;
-// const apiKey = import.meta.env.VITE_APIKEY_GIPHY;
-// const urlApi = import.meta.env.VITE_URL_API;
-
+import { useState } from "react";
+import { useAxios } from "./hooks/useAxios";
 
 export const Gimoji = () => {
+    const apiKey = import.meta.env.VITE_APIKEY_GIPHY;
+    const urlApi = "https://api.giphy.com/v1/gifs";
+    // const [dataGimoji, setDataGimoji] = useState([]);
+    // const [dataCategories, setDataCategories] = useState([]);
+    const [textSearch, setTextSearch] = useState("animals");
 
-    const noImage = 'https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg';
-    const apiKey = 'oivWS7jMDDIhg4T2PB8dqcRp7yroNtuT';
-    const [dataGimoji, setDataGimoji] = useState([]);
-    const [dataCategories, setDataCategories] = useState([]);
     const limit = 16;
+    const urlSearch = `/search?api_key=${apiKey}&q=${textSearch}&limit=${limit}&offset=0`;
+    const urlCategories = `${urlApi}/categories?api_key=${apiKey}`;
+    const { dataApi } = useAxios(urlSearch);
+    const { dataApi: dataCategories } = useAxios(urlCategories);
 
-    useEffect(() => {
-        getCategories();
-        getGimoji();
-    }, []);
+    // useEffect(() => {}, [textSearch]);
 
+    // const getGimoji = async () => {
+    //     // const resp = await fetch(
+    //     //     `${urlApi}/search?api_key=${apiKey}&q=${textSearch}&limit=${limit}&offset=0`
+    //     // );
+    //     // const { data } = await resp.json();
+    //     // setDataGimoji(data);
+    //     //AXIOS
+    //     const resp = await reqAxios.get(
+    //         `/search?api_key=${apiKey}&q=${textSearch}&limit=${limit}&offset=0`
+    //     );
+    //     const { data } = await resp.data;
+    //     setDataGimoji(data);
+    // };
 
-    const getGimoji = async() => {
-        const resp = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=animals&limit=${limit}&offset=0`);
-        const {data} = await resp.json();
-        setDataGimoji(data);
-    }
+    // useEffect(() => {
+    //     getCategories();
+    // }, []);
 
-    const getCategories = async() => {
-        const resp = await fetch(`https://api.giphy.com/v1/gifs/categories?api_key=${apiKey}`);
-        const {data} = await resp.json();
-        setDataCategories(data)
-    }
-    
-    
+    // const getCategories = async () => {
+    //     const resp = await fetch(`${urlApi}/categories?api_key=${apiKey}`);
+    //     const { data } = await resp.json();
+    //     setDataCategories(data);
+    // };
+
+    const onChangeData = (e) => {
+        setTextSearch(e.target.value);
+    };
+
+    const onClickSearch = (text) => {
+        setTextSearch(text);
+    };
+
     return (
-    <>
-        <div className="container-fluid mt-5">
-            <div className="row justify-content-start">
-                <div className="col-sm-4">  
-                    <CustomSelect 
-                        dataOptions={dataCategories}
-                    />
-                </div>
-                <div className="col-sm-6">
-                   <CustomSearch />
+        <>
+            <div className="container-fluid mt-5">
+                <div className="row justify-content-start">
+                    <div className="col-sm-4">
+                        <CustomSelect
+                            dataOptions={dataCategories}
+                            onChangeData={onChangeData}
+                        />
+                    </div>
+                    <div className="col-sm-6">
+                        <CustomSearch onClickSearch={onClickSearch} />
+                    </div>
                 </div>
             </div>
-        </div> 
 
-        <div className="album py-md-5 ">
-            <div className="container-fluid">
-                <div className="row row-cols-sm-1 row-cols-md-4 g-3">
-                    { dataGimoji.map( gif => (
-                        <CustomGifcard key={gif.id} dataItem={gif}/>
-                    ))}
-                </div>
-                <div className="row mt-5">
-                    <button 
-                        className='btn btn-outline-primary btn-lg'
-                        onClick={() => {}}
-                    >CARGAR MAS</button>
+            <div className="album py-md-5 ">
+                <div className="container-fluid">
+                    <div className="row row-cols-sm-1 row-cols-md-4 g-3">
+                        {dataApi.map((gif) => (
+                            <CustomGifcard key={gif.id} dataItem={gif} />
+                        ))}
+                    </div>
+                    <div className="row mt-5">
+                        <button
+                            className="btn btn-outline-primary btn-lg"
+                            onClick={() => {}}
+                        >
+                            CARGAR MAS
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>        
-    </>
-  )
-}
+        </>
+    );
+};
