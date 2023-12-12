@@ -3,6 +3,7 @@ import { CustomSearch } from "./components/filters/CustomSearch";
 import { CustomSelect } from "./components/filters/CustomSelect";
 import { useState } from "react";
 import { useAxios } from "./hooks/useAxios";
+import { Loading } from "./components/ui/Loading";
 
 export const Gimoji = () => {
     const apiKey = import.meta.env.VITE_APIKEY_GIPHY;
@@ -14,7 +15,7 @@ export const Gimoji = () => {
     const limit = 16;
     const urlSearch = `/search?api_key=${apiKey}&q=${textSearch}&limit=${limit}&offset=0`;
     const urlCategories = `${urlApi}/categories?api_key=${apiKey}`;
-    const { dataApi } = useAxios(urlSearch);
+    const { dataApi, isLoading } = useAxios(urlSearch);
     const { dataApi: dataCategories } = useAxios(urlCategories);
 
     // useEffect(() => {}, [textSearch]);
@@ -51,6 +52,9 @@ export const Gimoji = () => {
         setTextSearch(text);
     };
 
+    if (isLoading) {
+        return <Loading />;
+    }
     return (
         <>
             <div className="container-fluid mt-5">
