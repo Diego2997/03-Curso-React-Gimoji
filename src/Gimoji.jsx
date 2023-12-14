@@ -11,9 +11,11 @@ export const Gimoji = () => {
     // const [dataGimoji, setDataGimoji] = useState([]);
     // const [dataCategories, setDataCategories] = useState([]);
     const [textSearch, setTextSearch] = useState("animals");
+    const [offset, setOffset] = useState(0);
+    const [page, setPage] = useState(0);
 
     const limit = 16;
-    const urlSearch = `/search?api_key=${apiKey}&q=${textSearch}&limit=${limit}&offset=0`;
+    const urlSearch = `/search?api_key=${apiKey}&q=${textSearch}&limit=${limit}&offset=${offset}`;
     const urlCategories = `${urlApi}/categories?api_key=${apiKey}`;
     const { dataApi, isLoading } = useAxios(urlSearch);
     const { dataApi: dataCategories } = useAxios(urlCategories);
@@ -52,6 +54,23 @@ export const Gimoji = () => {
         setTextSearch(text);
     };
 
+    const onNextGif = () => {
+        setOffset((prev) => prev + limit);
+        setPage(page + 1);
+    };
+
+    const onPrevGif = () => {
+        setOffset((prev) => {
+            if (prev === 0) {
+                setPage(0);
+                return 0;
+            } else {
+                setPage(page - 1);
+                return prev - limit;
+            }
+        });
+    };
+
     if (isLoading) {
         return <Loading />;
     }
@@ -78,12 +97,19 @@ export const Gimoji = () => {
                             <CustomGifcard key={gif.id} dataItem={gif} />
                         ))}
                     </div>
-                    <div className="row mt-5">
+                    <div className=" mt-5 d-flex text-center ">
                         <button
                             className="btn btn-outline-primary btn-lg"
-                            onClick={() => {}}
+                            onClick={onPrevGif}
                         >
-                            CARGAR MAS
+                            Anterior
+                        </button>
+                        <h3>Pagina {page}</h3>
+                        <button
+                            className="btn btn-outline-primary btn-lg"
+                            onClick={onNextGif}
+                        >
+                            Siguiente
                         </button>
                     </div>
                 </div>
