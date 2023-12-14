@@ -4,6 +4,7 @@ import { CustomSelect } from "./components/filters/CustomSelect";
 import { useState } from "react";
 import { useAxios } from "./hooks/useAxios";
 import { Loading } from "./components/ui/Loading";
+import usePaginate from "./hooks/usePaginate";
 
 export const Gimoji = () => {
     const apiKey = import.meta.env.VITE_APIKEY_GIPHY;
@@ -11,10 +12,15 @@ export const Gimoji = () => {
     // const [dataGimoji, setDataGimoji] = useState([]);
     // const [dataCategories, setDataCategories] = useState([]);
     const [textSearch, setTextSearch] = useState("animals");
-    const [offset, setOffset] = useState(0);
-    const [page, setPage] = useState(0);
 
     const limit = 16;
+    const initialOffset = 0;
+    const initialPage = 1;
+    const { offset, page, restartOffsetAndPage, onNext, onPrev } = usePaginate(
+        initialOffset,
+        limit,
+        initialPage
+    );
     const urlSearch = `/search?api_key=${apiKey}&q=${textSearch}&limit=${limit}&offset=${offset}`;
     const urlCategories = `${urlApi}/categories?api_key=${apiKey}`;
     const { dataApi, isLoading } = useAxios(urlSearch);
@@ -48,27 +54,12 @@ export const Gimoji = () => {
 
     const onChangeData = (e) => {
         setTextSearch(e.target.value);
+        restartOffsetAndPage();
     };
 
     const onClickSearch = (text) => {
         setTextSearch(text);
-    };
-
-    const onNextGif = () => {
-        setOffset((prev) => prev + limit);
-        setPage(page + 1);
-    };
-
-    const onPrevGif = () => {
-        setOffset((prev) => {
-            if (prev === 0) {
-                setPage(0);
-                return 0;
-            } else {
-                setPage(page - 1);
-                return prev - limit;
-            }
-        });
+        restartOffsetAndPage();
     };
 
     if (isLoading) {
@@ -100,14 +91,14 @@ export const Gimoji = () => {
                     <div className=" mt-5 d-flex text-center ">
                         <button
                             className="btn btn-outline-primary btn-lg"
-                            onClick={onPrevGif}
+                            onClick={onPrev}
                         >
                             Anterior
                         </button>
                         <h3>Pagina {page}</h3>
                         <button
                             className="btn btn-outline-primary btn-lg"
-                            onClick={onNextGif}
+                            onClick={onNext}
                         >
                             Siguiente
                         </button>
